@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Area, AreaChart, ResponsiveContainer, Tooltip } from 'recharts'
-import { GoogleGenAI } from '@google/genai'
 import { Bell, Bot, Check, ChevronDown, CircleHelp, Clock3, Pause, Play, RotateCcw, ShieldCheck, WifiOff, Zap } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import DisasterMap from './components/DisasterMap'
@@ -73,7 +72,6 @@ export default function App() {
    setAnalyzing(true); 
    setAiAnalysis(''); 
    try { 
-     const ai = new GoogleGenAI({ apiKey: (import.meta as any).env.VITE_GEMINI_API_KEY }); 
      const prompt = `You are AEGIS-X Coordinator AI analyzing an urban emergency in Delhi.
 Incident ID: ${selected.id} - ${selected.title}
 Location: ${selected.detail}
@@ -101,14 +99,14 @@ Return STRICTLY raw JSON (no markdown fences, pure JSON object):
   "analysis": "2-sentence tactical briefing explaining vehicle choice and optimal arterial path."
 }`; 
 
-     const contents: any[] = [{ text: prompt }]; 
-     if (selected.photo) { 
-       const mimeType = selected.photo.split(';')[0].split(':')[1]; 
-       const base64 = selected.photo.split(',')[1]; 
-       contents.push({ inlineData: { mimeType, data: base64 } }); 
-     } 
-     const response = await ai.models.generateContent({ model: 'gemini-3.6-flash', contents }); 
-     const rawText = response.text || '{}'; 
+     const response = await fetch('/api/analyze-incident', {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({ prompt, photo: selected.photo })
+     });
+     const result = await response.json();
+     if (!response.ok) throw new Error(result.error || 'AI analysis failed.');
+     const rawText = result.analysis || '{}';
      const cleanJson = rawText.replace(/```json/g, '').replace(/```/g, '').trim(); 
      let parsed: any; 
      try { 
@@ -202,10 +200,8 @@ function DigitalTwin() {
 
   useEffect(() => {
     const fetchWeather = async () => {
-      const apiKey = (import.meta as any).env.VITE_WEATHER_API_KEY;
-      if (!apiKey) return;
       try {
-        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=28.6139&lon=77.2090&units=metric&appid=${apiKey}`);
+        const res = await fetch('/api/weather');
         const data = await res.json();
         if (data.main) {
           setWeatherData({

@@ -19,6 +19,24 @@ npm run build
 npm run preview
 ```
 
+## Deploy to Vercel
+
+Import this GitHub repository in Vercel. Vercel detects Vite automatically; use
+`npm run build` as the build command and `dist` as the output directory.
+
+Add these environment variables in **Project Settings → Environment Variables**
+for Production, Preview, and Development:
+
+```text
+GEMINI_API_KEY=your_google_ai_key
+GEMINI_MODEL=gemini-3.6-flash
+OPENWEATHER_API_KEY=your_openweathermap_key
+```
+
+The AI and weather integrations run through Vercel Functions in `api/`, so these
+keys remain server-side and must not be prefixed with `VITE_`. To test the API
+functions locally, run `npx vercel dev` after linking the project to Vercel.
+
 ## Structure
 
 ```
