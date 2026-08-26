@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       contents,
       config: {
         maxOutputTokens: 600,
-        systemInstruction: 'You are AEGIS-X, an emergency decision-support simulation. Analyze only the supplied simulated incident. Do not claim real-world authority, live data, or guaranteed outcomes. Give an operator a concise recommendation for human review.'
+        systemInstruction: 'You are Aethera-X, an emergency decision-support simulation. Analyze only the supplied simulated incident. Do not claim real-world authority, live data, or guaranteed outcomes. Give an operator a concise recommendation for human review.'
       }
     })
 
